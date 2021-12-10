@@ -1,14 +1,28 @@
-# STMO-ZOO
+# Compressed Sensing by Yeji Bae and Manon Montyne #
+####################################################
 
-Welcome to the STMO zoo! This is your final assignment for the course Selected Topics in Mathematical Optimization. Your goal is to implement an optimization method in Julia and contribute this to this repository. To pass, you have to:
+# Data compression
 
-- fork this repo and create a pull request;
-- add a module to `src` with **at least one function**
-- add at least one unit test to the folder `test`;
-- document all your functions and add a page to the documentation page;
-- make a notebook in [Pluto](https://github.com/fonsp/Pluto.jl) and add it to `notebooks`;
-- perform a small code review of two other students.
+In data compression, a certain signal is represented more efficiently in terms of the sparse vector of coefficients in a generic transform basis e.g. Fourier or wavelet bases. Since most natural signals are compressible, they can be written in terms of a sparse vector s ∈ R^n and a transform basis Ψ ∈ R^(nxn): 
 
-Depending on the project you choose some of these individual assignments might be really minimalistic, with other parts larger. For example, if you want to develop an application, say solving the graph coloring problem with Tabu Search, you might have only a single function in the source code (e.g., generating an instance) but have a fairly large notebook with a tutorial. On the other hand, if you work on a method, e.g., implementing Bee Colony Optimization, you might have many functions in the source code, while your notebook is only a demonstration on the test functions. 
+                                                                      x = Ψs
+                                                                      
+The number of non-zero elements in the vector s equals K. Therefore, we also describe s as being K-sparse.
 
-[![Build Status](https://travis-ci.org/MichielStock/STMOZOO.svg?branch=master)](https://travis-ci.org/MichielStock/STMOZOO)[![Coverage Status](https://coveralls.io/repos/github/MichielStock/STMOZOO/badge.svg?branch=master)](https://coveralls.io/github/MichielStock/STMOZOO?branch=master)
+Both images and audio signals are compressible in Fourier or wavelet bases. After taking the transform, most coefficient are close to zero and can thus be set equal to zero with a limited loss of quality. Afterwards, these few active coefficients can replace the original signal to be stored and transmitted. The original signal can then be recovered by taking the inverse transform.
+
+# Compressed sensing
+
+Compressed sensing on the other hand, turns the compression paradigm upside down: instead of compressing high-dimensional data by discarding most of the information, it is now possible to reconstruct a full signal from only a few measurements. The full signal can be recovered with high probability using convex algorithms. The mathematical formulation is as follows:
+
+ - The measurements y ∈ R^p, with K < p << n are given by: y =  Cx   
+ - C ∈ R^(pxn) is the measurement matrix  with a set of p linear measurements on the state of x
+ - We now need to find the sparsest vector s, consistent with the measurements y
+ - y = CΨs = Θs
+ - This sytem of equations is and underdetermined problem and we thus have infinitely many solutions for s, however we want to find the sparsest s for which these equations hold --> ŝ = argmin ||s||₀ subject to y = CΨs
+ - This optimization however is non-convex and a solution can only be found by brute-force search, therefore we will relax the optimization to a convex optimization: ŝ = argmin ||s||₁ subject to y = CΨs (here we take the l₁ norm or the Manhattan norm)
+
+Conditions
+- The matrix C must be incoherent with respect to Ψ
+- The number of measurements p must be sufficiently larger on the order of: p = O(K*log(n/K)) = k₁*K*log(n/K) (k₁ depends on how incoherent C and Ψ are)
+                                                                  
